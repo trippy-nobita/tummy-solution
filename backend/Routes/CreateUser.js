@@ -14,7 +14,7 @@ router.post("/createuser", [
     const errors = validationResult(req);
     if (!errors.isEmpty())
     {
-        return res.status(400).json({errors: error.array()});
+        return res.status(400).json({errors: errors.array()});
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -34,9 +34,20 @@ router.post("/createuser", [
     }
 });
 
-router.post("/loginuser", async (req, res) => {
+router.post("/loginuser", [
+    body('email').isEmail(),
+    body('password', 'Incorrect Password').isLength({ min: 5 })
+]
+,async (req, res) => {
     let email = req.body.email;
     try {
+       
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+    {
+        return res.status(400).json({errors: errors.array()});
+    }
+
        let userData =  await User.findOne(email);
 
        if (!userData)
@@ -44,7 +55,7 @@ router.post("/loginuser", async (req, res) => {
         return res.status(400).json({errors: "Try logging in with correct credentials"})
        }
 
-       if (!req.body.password === userData.password) 
+       if (req.body.password !== userData.password)
        {
          return res.status(400).json({errors: "Try logging with correct credentials"})
        }

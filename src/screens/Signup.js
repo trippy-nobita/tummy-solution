@@ -11,6 +11,14 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!credentials.name || credentials.email || credentials.password)
+    {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    try{
     const response = await fetch("http://localhost:5000/api/createuser", {
       method: "POST",
       headers: {
@@ -20,7 +28,7 @@ export default function Signup() {
         name: credentials.name,
         email: credentials.email,
         password: credentials.password,
-        location: credentials.geolocation,
+        geolocation: credentials.geolocation,
       }),
     });
 
@@ -30,6 +38,12 @@ export default function Signup() {
     if (!json.success) {
       alert("Enter Valid credentials");
     }
+  }
+  catch(error)
+  {
+    console.error("Error:", error);
+  }
+  
   };
 
   const onChange = (event) => {
